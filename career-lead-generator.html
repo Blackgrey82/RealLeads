@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Real Leads — Career Lead Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1714;
+    --paper: #f5f0e8;
+    --warm-mid: #e8e0d0;
+    --accent: #c5440a;
+    --accent-dark: #8f2f05;
+    --muted: #7a7168;
+    --line: #c8bfb0;
+    --success: #2d6a4f;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,0,0,0.04) 27px, rgba(0,0,0,0.04) 28px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 3px solid var(--ink);
+    padding: 32px 0 20px;
+    margin-bottom: 0;
+  }
+
+  .masthead {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding-bottom: 4px;
+  }
+
+  .subheader {
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .subheader p {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .disclaimer-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    background: var(--warm-mid);
+    padding: 3px 8px;
+    border: 1px solid var(--line);
+  }
+
+  /* INTRO */
+  .intro {
+    margin-bottom: 40px;
+  }
+
+  .intro h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .intro p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #3a3530;
+    max-width: 640px;
+  }
+
+  /* FORM */
+  .form-section {
+    background: white;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--ink);
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 4px 4px 0 var(--warm-mid);
+  }
+
+  .field-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .field-hint {
+    font-size: 13px;
+    color: var(--muted);
+    font-style: italic;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 220px;
+    padding: 16px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    line-height: 1.7;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus {
+    border-color: var(--ink);
+  }
+
+  textarea::placeholder {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  @media (max-width: 600px) {
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  .field-group { display: flex; flex-direction: column; }
+
+  input[type="text"] {
+    padding: 12px 16px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--ink);
+  }
+
+  input::placeholder {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .submit-row {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn-generate {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 14px 32px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    position: relative;
+  }
+
+  .btn-generate:hover {
+    background: var(--accent);
+  }
+
+  .btn-generate:active {
+    transform: translateY(1px);
+  }
+
+  .btn-generate:disabled {
+    background: var(--muted);
+    cursor: not-allowed;
+  }
+
+  .no-guarantee {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    max-width: 340px;
+    line-height: 1.5;
+  }
+
+  /* LOADING */
+  .loading-state {
+    display: none;
+    padding: 48px 32px;
+    text-align: center;
+    background: white;
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--accent);
+    margin-bottom: 32px;
+    box-shadow: 4px 4px 0 var(--warm-mid);
+  }
+
+  .loading-state.visible { display: block; }
+
+  .loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .loading-message {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* RESULTS */
+  .results-section {
+    display: none;
+    margin-bottom: 48px;
+  }
+
+  .results-section.visible { display: block; }
+
+  .results-header {
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .results-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .results-header .timestamp {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .results-body {
+    background: white;
+    border: 1px solid var(--line);
+    padding: 36px;
+    box-shadow: 4px 4px 0 var(--warm-mid);
+    font-size: 15px;
+    line-height: 1.8;
+    color: #2a2520;
+  }
+
+  /* Markdown-style formatting for results */
+  .results-body h1, .results-body h2, .results-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    margin: 28px 0 12px;
+    color: var(--ink);
+  }
+
+  .results-body h1 { font-size: 26px; border-bottom: 2px solid var(--line); padding-bottom: 8px; }
+  .results-body h2 { font-size: 20px; color: var(--accent-dark); }
+  .results-body h3 { font-size: 17px; }
+
+  .results-body p { margin-bottom: 14px; }
+
+  .results-body ul, .results-body ol {
+    margin: 12px 0 16px 24px;
+  }
+
+  .results-body li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+  }
+
+  .results-body strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .results-body em {
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .results-body hr {
+    border: none;
+    border-top: 1px solid var(--line);
+    margin: 28px 0;
+  }
+
+  .results-body blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    margin: 20px 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* RESET BTN */
+  .btn-reset {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    padding: 8px 16px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  /* ERROR */
+  .error-box {
+    display: none;
+    background: #fff5f5;
+    border: 1px solid #f5c6c6;
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: #7a2020;
+  }
+
+  .error-box.visible { display: block; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 24px 0;
+    margin-top: 40px;
+  }
+
+  footer p {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  footer .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-style: normal;
+    font-size: 10px;
+    display: block;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<div class="container">
+  <header>
+    <div class="masthead">
+      <div class="logo">Real<span>Leads</span></div>
+      <div class="tagline">Career Lead Generator — Free & Public</div>
+    </div>
+  </header>
+
+  <div class="subheader">
+    <p>Built to help people find credible work based on who they actually are — not just their title or degree.</p>
+    <span class="disclaimer-tag">No Guarantees. No Charges. No Job Board.</span>
+  </div>
+
+  <div class="intro">
+    <h2>Your background tells more than your title does.</h2>
+    <p>Paste your resume below — work history, education, certifications, even hobbies. This tool reads all of it, finds the fields and roles your real background points toward, tells you what's blocking you and how to close the gap, and gives you one clear direction to act on today.</p>
+  </div>
+
+  <div class="form-section" id="formSection">
+    <label class="field-label" for="resumeInput">Your Resume</label>
+    <span class="field-hint">Paste everything — jobs, education, certs, volunteer work, hobbies, projects. All of it is signal.</span>
+    <textarea id="resumeInput" placeholder="Paste your resume here. Don't worry about formatting — just get the content in. The more you include, the more useful your leads will be."></textarea>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label" for="targetField">Target Field or Industry <span style="font-weight:400;text-transform:none;font-family:'Source Serif 4',serif;font-size:12px;color:var(--muted)">(optional)</span></label>
+        <span class="field-hint">e.g. Finance, Healthcare, Logistics, Tech</span>
+        <input type="text" id="targetField" placeholder="Leave blank to let the tool decide">
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="location">Location or Remote Preference <span style="font-weight:400;text-transform:none;font-family:'Source Serif 4',serif;font-size:12px;color:var(--muted)">(optional)</span></label>
+        <span class="field-hint">e.g. Kansas City, MO — or Remote</span>
+        <input type="text" id="location" placeholder="e.g. Chicago IL or Remote">
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-generate" id="generateBtn" onclick="generateLeads()">Generate My Leads →</button>
+      <p class="no-guarantee">This tool helps you identify more credible opportunities. It does not guarantee interviews, offers, or employment. Hiring decisions rest with employers.</p>
+    </div>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="loading-state" id="loadingState">
+    <div class="loading-dots">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="loading-message" id="loadingMessage">Reading your background...</div>
+  </div>
+
+  <div class="results-section" id="resultsSection">
+    <div class="results-header">
+      <h3>Your Career Leads</h3>
+      <span class="timestamp" id="timestamp"></span>
+    </div>
+    <div class="results-body" id="resultsBody"></div>
+    <button class="btn-reset" onclick="resetForm()">← Start Over</button>
+  </div>
+
+  <footer>
+    <p>RealLeads is a free public tool built to help overlooked candidates find credible work based on skills, experience, certifications, and transferable ability — not education alone. It is not a job board, does not list employers, and charges nothing to anyone.</p>
+    <span class="mono">No guarantees of employment, interviews, or offers. Results are informational only.</span>
+  </footer>
+</div>
+
+<script>
+  const SYSTEM_PROMPT = `You are a career lead generator. When a user uploads or pastes their resume, your job is to turn their entire background into credible, targeted career leads. You read everything — their work experience, education at any level, certifications, and hobbies — because all of it is signal. A hobby can reveal real skills and interests. Education, whether a degree, a certificate, or an incomplete program, points toward capability and direction. Job titles alone do not tell the full story. Your job is to identify which fields and industries the whole person points toward, surface realistic opportunities they may never have searched for, find what's blocking them from those leads, and suggest specific resume changes that would improve their odds of landing them. You do not guarantee employment. You give honest, actionable lead direction — encouraging but real, without hype or false hope.
+
+Do not rely on job titles to determine fit. A title is a label, not a full picture. Instead, look at what the person actually did — the tasks, responsibilities, environments they worked in, problems they solved, and skills they used repeatedly. A security officer who documented incidents, monitored systems, enforced policy, and escalated issues has demonstrated skills that transfer into fraud intake, compliance support, investigations, operations, and risk roles. A warehouse worker who tracked inventory, managed timelines, and coordinated logistics may be a realistic candidate for supply chain, procurement, or operations analyst roles. Your job is to see past the title and read what the person actually brought to their work — then match that to credible leads they are realistically competitive for, even if they would never have searched for those roles themselves.
+
+Not every user will have traditional work experience. Some may be entering the workforce for the first time. Some may have gaps. Some may have spent years doing meaningful work that was never paid or formally titled — volunteering, caregiving, running a household, building things, creating content, organizing communities, or developing skills through hobbies and personal projects. Do not treat the absence of formal employment as the absence of ability. Read what they have done, paid or unpaid, and identify the real skills those activities demonstrate. A person who has spent years woodworking has demonstrated precision, planning, material knowledge, and attention to detail. A person who has volunteered coordinating events has demonstrated logistics, communication, and organization. Treat every section of the resume — including hobbies, volunteer work, and personal projects — as legitimate signal when generating leads. Everyone deserves an honest picture of where their real background could take them.
+
+When presenting leads, be specific and honest. Do not generate a vague list of job titles. For each lead, explain why this person is a realistic candidate based on what you actually found in their resume, education, hobbies, or background. Include what makes them competitive, what might work against them, and what one or two things would improve their odds of being taken seriously for that role. Tell them where to look — what search terms to use, what types of employers hire for this role, and what platforms or communities are most likely to surface real opportunities in this field. Present everything in plain language — not corporate speak, not buzzwords. The person reading this may be frustrated, overlooked, or starting over. They do not need hype. They need direction they can actually act on. Every lead should feel like it was written for that specific person, not copied from a job description.
+
+End every response with clarity, not overwhelm. Do not dump every possible option on the person at once. After presenting leads, close with three things. First, the single most realistic lead based on everything you found — the one they should pursue first and why. Second, the one change to their resume or background presentation that would have the biggest immediate impact on their odds. Third, one clear next step they can take today — a specific search term, a type of employer to look up, a certification worth looking into, or a community worth joining. Keep the closing encouraging but grounded. Do not promise outcomes. Do not inflate odds. Leave the person feeling like they have a real direction, not a dream. The goal is not to make them feel good for five minutes. The goal is to give them something they can actually act on before the day is over.
+
+Treat certifications as education, not background noise. When a user lists certifications, they are showing you what they chose to learn on their own time and on purpose. That is evidence of direction, discipline, and intent — carry the same weight as formal education when generating leads. Do not treat them as supporting detail. Read them as primary signal. When you see a certification list, identify which certification is doing the most work — the one most directly connected to credible, realistic opportunities. Build your strongest leads around that one first and tell the user which cert is carrying the most weight and why. Then look at every remaining certification. Do not discard any of them. Find where they support the primary leads, or where they open separate doors on their own. A person with certifications in financial analysis, SQL, and cybersecurity foundations is not three separate candidates — they are one candidate with a combined profile that may be more competitive than any single cert alone. Always look for where certifications overlap and name what that combination actually points toward.
+
+Format your response using markdown: use ## for section headers, **bold** for role names and key points, and clear paragraph breaks. Keep language human and direct.`;
+
+  const loadingMessages = [
+    "Reading your background...",
+    "Looking past your job titles...",
+    "Finding fields your experience points toward...",
+    "Identifying what's blocking you...",
+    "Building your lead list..."
+  ];
+
+  let loadingInterval;
+
+  async function generateLeads() {
+    const resume = document.getElementById('resumeInput').value.trim();
+    const targetField = document.getElementById('targetField').value.trim();
+    const location = document.getElementById('location').value.trim();
+
+    if (!resume) {
+      showError("Please paste your resume before generating leads.");
+      return;
+    }
+
+    if (resume.length < 100) {
+      showError("That looks a bit short. Add more detail — jobs, hobbies, education, anything helps.");
+      return;
+    }
+
+    clearError();
+    setLoading(true);
+
+    let userMessage = `Here is my resume:\n\n${resume}`;
+    if (targetField) userMessage += `\n\nTarget field or industry: ${targetField}`;
+    if (location) userMessage += `\nLocation preference: ${location}`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 4000,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userMessage }]
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || "Something went wrong. Please try again.");
+      }
+
+      const text = data.content
+        .filter(b => b.type === "text")
+        .map(b => b.text)
+        .join("\n");
+
+      setLoading(false);
+      showResults(text);
+
+    } catch (err) {
+      setLoading(false);
+      showError("Something went wrong: " + err.message);
+    }
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('generateBtn');
+    const loading = document.getElementById('loadingState');
+    const form = document.getElementById('formSection');
+    const results = document.getElementById('resultsSection');
+
+    if (on) {
+      btn.disabled = true;
+      loading.classList.add('visible');
+      results.classList.remove('visible');
+      let i = 0;
+      loadingInterval = setInterval(() => {
+        document.getElementById('loadingMessage').textContent = loadingMessages[i % loadingMessages.length];
+        i++;
+      }, 1800);
+    } else {
+      btn.disabled = false;
+      loading.classList.remove('visible');
+      clearInterval(loadingInterval);
+    }
+  }
+
+  function showResults(text) {
+    document.getElementById('resultsSection').classList.add('visible');
+    document.getElementById('timestamp').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('resultsBody').innerHTML = markdownToHtml(text);
+    document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function markdownToHtml(text) {
+    return text
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/^---$/gm, '<hr>')
+      .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+      .replace(/^\- (.+)$/gm, '<li>$1</li>')
+      .replace(/^\d+\. (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>\n?)+/g, match => `<ul>${match}</ul>`)
+      .replace(/\n\n+/g, '</p><p>')
+      .replace(/^(?!<[hublp])(.+)$/gm, (m) => m.trim() ? m : '')
+      .replace(/^(.+)$/gm, (m) => {
+        if (m.startsWith('<') || !m.trim()) return m;
+        return `<p>${m}</p>`;
+      })
+      .replace(/<p><\/p>/g, '')
+      .replace(/<p>(<[hublhr])/g, '$1')
+      .replace(/(<\/[hublhr][^>]*>)<\/p>/g, '$1');
+  }
+
+  function resetForm() {
+    document.getElementById('resultsSection').classList.remove('visible');
+    document.getElementById('resumeInput').value = '';
+    document.getElementById('targetField').value = '';
+    document.getElementById('location').value = '';
+    clearError();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = msg;
+    box.classList.add('visible');
+  }
+
+  function clearError() {
+    document.getElementById('errorBox').classList.remove('visible');
+  }
+</script>
+</body>
+</html>
